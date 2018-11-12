@@ -6,7 +6,8 @@ class AppFacade {
         }
         return this.facade;
     }
-
+     /**接收所有网络消息*/
+    public static NETWORK_RECIVE_MSG: string = "network_recive_msg";
     private _decodeList: any;
     /**添加decode*/
     private addNetDecode(decode: any) {
@@ -31,12 +32,12 @@ class AppFacade {
     private addCommand(commandStr:string,commandClass:string) {
         this._commandList[commandClass][commandStr] = commandStr;
     }
-    /**移cmd */
+    /**移除单个cmd */
     private removeCommand(commandStr: string,commandClass:string) {
         this._commandList[commandClass][commandStr] = null;
         delete this._commandList[commandClass][commandStr];
     }
-    /**移cmd */
+    /**移除相关模块所有cmd */
     public removeAllCommand(commandClass:string) {
         for(let i in this._commandList[commandClass]){
             AppFacade.getInstance().removeCommand(i);
@@ -45,6 +46,8 @@ class AppFacade {
         delete this._commandList[commandClass];
     }
     initializeController(): void {
+        //所有网络消息处理
+        this.registerCommand(AppFacade.NETWORK_RECIVE_MSG, NetworkReciveCommand)
         // 茶馆相关模块
         this.registerCommand(CommunityConst.STARTUP, CommunityStartupCMD,CommunityStartupCMD.moduleName);
         this.registerCommand(CommunityConst.CMD0, CommunityStartupCMD,CommunityStartupCMD.moduleName);
@@ -65,9 +68,9 @@ class AppFacade {
     private registerProxy(model: any) {
 
     }
-    private registerCommand(commandStr: string,cmd:any,commandClass:string) {
+    private registerCommand(commandStr: string,cmd:any,commandClass?:string) {
         //super.registerCommand(commandStr,cmd);
-        this.addCommand(commandStr,commandClass);
+        if(commandClass)this.addCommand(commandStr,commandClass);
 
     }
 }

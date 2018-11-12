@@ -1,15 +1,10 @@
-class CommunityViewMediator extends puremvc.Mediator {
+class CommunityViewMediator{
     public static NAME: string = "CommunityViewMediator";
 
     private _clubDataProvider: eui.ArrayCollection;
-    private _defaultSelectIndex: number = 0;
 
-    constructor(view: any,
-        clubDataProvider: eui.ArrayCollection,
-        selectIndex: number = 0) {
-        super(CommunityViewMediator.NAME, view);
+    constructor(view: any) {
         this._clubDataProvider = clubDataProvider;
-        this._defaultSelectIndex = selectIndex;
     }
     public onRegister() {
         this.view.addEventListener(BaseComponent.INIT_COMPONENT_FINISH, this.initFinish, this);
@@ -18,9 +13,7 @@ class CommunityViewMediator extends puremvc.Mediator {
         return this.getViewComponent()
     }
     public onRemove() {
-
         this.view["gameTabBar"].removeEventListener(eui.ItemTapEvent.ITEM_TAP, this.onChangeTab, this);
-        // this.view.getGameTab().dataProvider=null;
         this.onRemoveRoomListGroup();
     }
 
@@ -241,43 +234,22 @@ class CommunityViewMediator extends puremvc.Mediator {
 
     public listNotificationInterests(): string[] {
         return [
-            CommunityConst.COMMUNITY_UPDATE_VIEW,
-            CommunityConst.COMMUNITY_UPDATE_TABLE,
-            CommunityConst.COMMUNITY_UPDATE_HOTPOINT,
-            PublicNotification.Update_User_Basic_Info
+            CommunityConst.COMMUNITY_UPDATE_VIEW
         ]
     }
 
-    public handleNotification(notification: puremvc.INotification): void {
+    public handleNotification(notification: any): void {
         let name = notification.getName()
         switch (name) {
             case CommunityConst.COMMUNITY_UPDATE_VIEW:
                 let clubData = notification.getBody();
-                if (this._gameTabBar.selectedIndex == -1) {
-                    this._gameTabBar.selectedIndex = this._defaultSelectIndex;
-                }
-                //请求当前俱乐部桌子列表
                 let selectedItemData = this._gameTabBar.selectedItem;
-                if (selectedItemData && selectedItemData.clubId) {
-                    this.RequestRoomList(selectedItemData.clubId);
-                }
-                //刷新茶馆界面tableBar
-                // this.view.refreshView();
-                //刷新茶馆界面 以及桌子列表
-                this.onChangeTab(null);
+                this.view.tabList.dataProvaider = clubData; 
+                this.RequestRoomList(selectedItemData.clubId);
                 break;
             case CommunityConst.COMMUNITY_UPDATE_TABLE:
-                let data = notification.getBody()
-                // this.view.updateTime(data);
-                this._roomListView.updateRoomList();
-                break;
-            case CommunityConst.COMMUNITY_UPDATE_HOTPOINT:
-                let hotPointData = notification.getBody()
-                // this.view.updateTime(data);
-                // this._detailView.refreshView();
-                break;
-            case PublicNotification.Update_User_Basic_Info:
-                this.view.updateUserInfo();
+                let tableData:CommunityData.stTableData = notification.getBody();
+                this.view.roomList.dataProvaider = clubData; 
                 break;
         }
     }

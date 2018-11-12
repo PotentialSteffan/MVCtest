@@ -7,9 +7,7 @@ class CommunityStartupCMD {
         let proxy = facade.retrieveProxy(CommunityModel.NAME) as CommunityModel
 
         let theView = new CommunityView();
-        let mediator = new CommunityViewMediator(theView,
-            proxy.clubDataProvider,
-            body.data ? body.data.selectIndex : 0
+        let mediator = new CommunityViewMediator(theView
         );
         facade.registerMediator(mediator);
 
